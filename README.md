@@ -1,6 +1,6 @@
-# Galería de imagenes con IA - Plataforma Full Stack con IA
+# Galería de imágenes con IA - Plataforma Full Stack con IA
 
-¡Bienvenido a **Proyecto-1**! Esta es una plataforma web completa desarrollada con el stack **MEAN/MERN** (usando Angular en el frontend) orientada a la creación de artículos y generación de imágenes mediante Inteligencia Artificial.
+Esta es una plataforma web completa desarrollada con el stack **MEAN/MERN** (usando Angular en el frontend) orientada a la creación de artículos y generación de imágenes mediante Inteligencia Artificial.
 
 Este proyecto abarca desde una sólida **API REST** construida con Node.js, Express y MongoDB, hasta un dinámico **Frontend SPA** estructurado en Angular 21, ofreciendo funcionalidades como autenticación de usuarios, panel de administración interactivo, carga y procesamiento de imágenes, y una integración directa con modelos de **Hugging Face** para la generación de imágenes IA.
 
