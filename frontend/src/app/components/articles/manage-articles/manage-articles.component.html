@@ -1,0 +1,58 @@
+<div class="container">
+  <div class="glass-card manage-card">
+    <header class="manage-header">
+      <div class="header-main">
+        <h2>Gestionar Mis Artículos</h2>
+        <a routerLink="/create" class="primary-btn" appNavAllowed="/create">Nuevo Artículo</a>
+      </div>
+      <div class="search-box glass-card">
+        <input type="text" [(ngModel)]="search" placeholder="Buscar en mis artículos..." (keyup.enter)="onSearch()">
+        <button (click)="onSearch()" class="btn-search">🔍</button>
+      </div>
+    </header>
+
+    <div *ngIf="loading" class="loader">Cargando artículos...</div>
+
+    <div *ngIf="error" class="error-container glass-card">
+      <p>⚠️ No pudimos cargar tus artículos.</p>
+      <button (click)="loadArticles()" class="retry-btn">Reintentar</button>
+    </div>
+
+    <div class="table-container" *ngIf="!loading && articles.length > 0">
+      <table class="manage-table">
+        <thead>
+          <tr>
+            <th>Título</th>
+            <th>Fecha de Creación</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let article of articles">
+            <td class="title-cell">{{ article.title }}</td>
+            <td>{{ article.createdAt | date:'shortDate' }}</td>
+            <td class="actions-cell">
+              <a [routerLink]="['/article', article._id]" class="btn-icon view" title="Ver">👁️</a>
+              <a [routerLink]="['/edit-article', article._id]" class="btn-icon edit" title="Editar" [appNavAllowed]="['/edit-article', article._id]">✏️</a>
+              <button (click)="deleteArticle(article._id)" class="btn-icon delete" title="Eliminar">🗑️</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div *ngIf="!loading && articles.length === 0" class="no-data">
+      <p *ngIf="!search">Aún no has creado ningún artículo.</p>
+      <p *ngIf="search">No se encontraron artículos que coincidan con "{{ search }}".</p>
+      <a *ngIf="!search" routerLink="/create" class="link" appNavAllowed="/create">¡Crea el primero ahora!</a>
+      <button *ngIf="search" (click)="search=''; onSearch()" class="retry-btn">Ver todos</button>
+    </div>
+
+    <!-- Paginación -->
+    <div class="pagination" *ngIf="!loading && !error">
+      <button [disabled]="page === 1" (click)="changePage(-1)" class="pag-btn">Anterior</button>
+      <span class="pag-info">Página {{ page }} de {{ totalPages }} · {{ limit }} por página</span>
+      <button [disabled]="page === totalPages" (click)="changePage(1)" class="pag-btn">Siguiente</button>
+    </div>
+  </div>
+</div>

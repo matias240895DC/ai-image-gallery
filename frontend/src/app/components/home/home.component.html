@@ -1,0 +1,33 @@
+<div class="container">
+  <header class="home-header">
+    <h1>{{ projectName }}</h1>
+    <p>{{ homeTagline }}</p>
+  </header>
+
+  <div *ngIf="loading" class="loader">Cargando...</div>
+
+  <div *ngIf="!loading && loadError" class="no-articles">
+    <p>{{ loadError }}</p>
+  </div>
+
+  <div class="articles-grid" *ngIf="!loading && !loadError">
+    <article *ngFor="let article of articles" class="glass-card article-card">
+      <div class="article-image">
+        <img loading="lazy" [src]="url + 'articles/' + article._id + '/poster'" [alt]="article.title" onerror="this.src='https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1000&auto=format&fit=crop'">
+      </div>
+      <div class="article-content">
+        <span class="date">{{ article.createdAt | date:'mediumDate' }}</span>
+        <h3>{{ article.title }}</h3>
+        <p>{{ article.content | slice:0:120 }}...</p>
+        <div class="article-footer">
+          <span class="author" *ngIf="article.user">Por: {{ article.user.name }}</span>
+          <a [routerLink]="['/article', article._id]" class="read-more">Leer más →</a>
+        </div>
+      </div>
+    </article>
+  </div>
+
+  <div *ngIf="!loading && !loadError && articles.length === 0" class="no-articles">
+    <p>No se encontraron artículos.</p>
+  </div>
+</div>

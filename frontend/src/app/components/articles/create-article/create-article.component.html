@@ -1,0 +1,54 @@
+<div class="container">
+  <div class="glass-card create-card">
+    <h2>Crear Nuevo Artículo</h2>
+    <p class="subtitle">Comparte tus conocimientos con el mundo</p>
+
+    <div *ngIf="status === 'success'" class="alert success">
+      Artículo creado correctamente. Redirigiendo...
+    </div>
+    <div *ngIf="status === 'error'" class="alert error">
+      Error al crear el artículo. Por favor, inténtalo de nuevo.
+    </div>
+
+    <form #articleForm="ngForm" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label>Título del Artículo <span class="required">*</span></label>
+        <input type="text" name="title" [(ngModel)]="article.title" required minlength="5" maxlength="100" #title="ngModel">
+        <div *ngIf="title.invalid && (title.dirty || title.touched)" class="error-text">
+          <span *ngIf="title.errors?.['required']">El título es obligatorio</span>
+          <span *ngIf="title.errors?.['minlength']">Mínimo 5 caracteres</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Contenido <span class="required">*</span></label>
+        <textarea name="content" [(ngModel)]="article.content" required minlength="20" maxlength="5000" #content="ngModel" rows="10"></textarea>
+        <div *ngIf="content.invalid && (content.dirty || content.touched)" class="error-text">
+          <span *ngIf="content.errors?.['required']">El contenido es obligatorio</span>
+          <span *ngIf="content.errors?.['minlength']">Mínimo 20 caracteres</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Imagen del Artículo (Opcional)</label>
+        <div class="file-upload-wrapper">
+          <input type="file" (change)="fileChangeEvent($event)" accept="image/*" id="imageInput">
+          <label for="imageInput" class="file-label">
+            <span *ngIf="!imageSelected">Seleccionar Imagen</span>
+            <span *ngIf="imageSelected">{{ imageSelected.name }}</span>
+          </label>
+          <div *ngIf="imagePreview" class="image-preview">
+            <div class="img-wrapper">
+              <img [src]="imagePreview" alt="Vista previa">
+              <button type="button" class="remove-img" (click)="removeImage()">×</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <button type="submit" class="primary w-full" [disabled]="!articleForm.form.valid || submitting">
+        {{ submitting ? 'Guardando...' : 'Publicar Artículo' }}
+      </button>
+    </form>
+  </div>
+</div>

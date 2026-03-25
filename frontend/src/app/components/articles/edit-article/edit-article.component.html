@@ -1,0 +1,70 @@
+<div class="container">
+  <div class="glass-card edit-card">
+    <h2>Editar Artículo</h2>
+    <p class="subtitle">Actualiza el contenido de tu publicación</p>
+
+    <div *ngIf="status === 'success'" class="alert success">
+      Artículo actualizado correctamente. Redirigiendo...
+    </div>
+    <div *ngIf="status === 'error'" class="alert error">
+      {{ message }}
+    </div>
+
+    <form #articleForm="ngForm" (ngSubmit)="onSubmit()" *ngIf="!loadingData">
+      <div class="form-group">
+        <label>Título del Artículo <span class="required">*</span></label>
+        <input type="text" name="title" [(ngModel)]="article.title" required minlength="5" maxlength="100" #title="ngModel">
+        <div *ngIf="title.invalid && (title.dirty || title.touched)" class="error-text">
+          <span *ngIf="title.errors?.['required']">El título es obligatorio</span>
+          <span *ngIf="title.errors?.['minlength']">Mínimo 5 caracteres</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Contenido <span class="required">*</span></label>
+        <textarea name="content" [(ngModel)]="article.content" required minlength="20" maxlength="5000" #content="ngModel" rows="10"></textarea>
+        <div *ngIf="content.invalid && (content.dirty || content.touched)" class="error-text">
+          <span *ngIf="content.errors?.['required']">El contenido es obligatorio</span>
+          <span *ngIf="content.errors?.['minlength']">Mínimo 20 caracteres</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Imagen del Artículo (Opcional - Selecciona una nueva para cambiarla)</label>
+        <div class="file-upload-wrapper">
+          <input type="file" (change)="fileChangeEvent($event)" accept="image/*" id="imageInput">
+          <label for="imageInput" class="file-label">
+            <span *ngIf="!imageSelected">Cambiar Imagen</span>
+            <span *ngIf="imageSelected">{{ imageSelected.name }}</span>
+          </label>
+          
+          <div class="image-preview-container">
+            <div *ngIf="article.image && !imagePreview" class="image-preview current">
+              <p class="preview-label">Imagen actual:</p>
+              <img [src]="url + 'articles/' + article._id + '/poster'" alt="Imagen actual">
+            </div>
+            <div *ngIf="imagePreview" class="image-preview new">
+              <p class="preview-label">Nueva imagen:</p>
+              <div class="img-wrapper">
+                <img [src]="imagePreview" alt="Vista previa">
+                <button type="button" class="remove-img" (click)="removeImage()">×</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button type="submit" class="primary" [disabled]="!articleForm.form.valid || submitting">
+          {{ submitting ? 'Guardando...' : 'Actualizar Artículo' }}
+        </button>
+        <button type="button" class="secondary" (click)="goBack()">Cancelar</button>
+      </div>
+    </form>
+
+    <div *ngIf="loadingData" class="loader">
+       <div class="spinner"></div>
+       <p>Cargando datos del artículo...</p>
+    </div>
+  </div>
+</div>

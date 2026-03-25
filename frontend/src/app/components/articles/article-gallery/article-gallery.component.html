@@ -1,0 +1,113 @@
+<div class="container gallery-container">
+  <header class="gallery-header">
+    <h1>Galería de {{ projectTitle }}</h1>
+    <p>{{ galleryHeaderSubtitle }}</p>
+  </header>
+
+  <section class="gallery-section">
+    <div class="section-actions">
+      <div class="section-info">
+        <h2>{{ galleryRecentTitle }}</h2>
+        <p>{{ galleryRecentSubtitle }}</p>
+      </div>
+      <div class="search-box glass-card">
+        <input type="text" [(ngModel)]="search" placeholder="Buscar artículos..." (keyup.enter)="onSearch()">
+        <button (click)="onSearch()" class="btn-search">🔍</button>
+      </div>
+    </div>
+
+    <div *ngIf="loading" class="loader">
+      <div class="spinner"></div>
+      <p>Cargando artículos...</p>
+    </div>
+
+    <div *ngIf="error" class="error-container glass-card">
+      <p>⚠️ Error al cargar los artículos.</p>
+      <button (click)="getArticles()" class="retry-btn">Reintentar</button>
+    </div>
+
+    <div class="gallery-grid" *ngIf="!loading && articles.length > 0">
+      <div *ngFor="let article of articles" class="gallery-item glass-card">
+        <div class="item-media">
+          <img loading="lazy" [src]="url + 'articles/' + article._id + '/poster'" [alt]="article.title" onerror="this.src='https://images.unsplash.com/photo-1557683316-973673baf926?q=80&w=1000'">
+          <div class="overlay">
+            <a [routerLink]="['/article', article._id]" class="view-btn">Ver Artículo</a>
+          </div>
+        </div>
+        <div class="item-info">
+          <h3>{{ article.title }}</h3>
+          <span class="author" *ngIf="article.user">Por: {{ article.user?.name }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="!loading && articles.length === 0" class="no-data">
+      <p>No se encontraron artículos que coincidan con tu búsqueda.</p>
+      <button *ngIf="search" (click)="search=''; onSearch()" class="retry-btn">Ver todos</button>
+    </div>
+
+    <!-- Paginación -->
+    <div class="pagination" *ngIf="!loading && !error">
+      <button [disabled]="page === 1" (click)="changePage(-1)" class="pag-btn">Anterior</button>
+      <span class="pag-info">Página {{ page }} de {{ totalPages }} · {{ limit }} por página</span>
+      <button [disabled]="page === totalPages" (click)="changePage(1)" class="pag-btn">Siguiente</button>
+    </div>
+  </section>
+
+  <div class="section-divider"></div>
+
+  <section class="gallery-section">
+    <div class="section-actions">
+      <div class="section-info">
+        <h2>{{ galleryAiTitle }}</h2>
+        <p>{{ galleryAiSubtitle }}</p>
+      </div>
+      <div class="search-box glass-card">
+        <input type="text" [(ngModel)]="searchAi" placeholder="Buscar en el arte..." (keyup.enter)="onSearchAi()">
+        <button (click)="onSearchAi()" class="btn-search">🔍</button>
+      </div>
+    </div>
+
+    <div *ngIf="loadingAi" class="loader">
+      <div class="spinner"></div>
+      <p>Preparando la galería digital...</p>
+    </div>
+
+    <div *ngIf="errorAi" class="error-container glass-card">
+      <p>⚠️ No pudimos conectar con la galería de arte IA.</p>
+      <button (click)="getAiImages()" class="retry-btn">Reintentar</button>
+    </div>
+
+    <div class="ai-grid" *ngIf="!loadingAi && aiImages.length > 0">
+      <div *ngFor="let image of aiImages" class="ai-card glass-card">
+        <div class="card-media">
+            <img
+              loading="lazy"
+              [src]="_articleService.getAiImagePoster(image.filename)"
+              [alt]="image.prompt"
+              onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=1200&auto=format&fit=crop';"
+            >
+          <div class="card-overlay">
+            <p class="prompt-text">"{{ image.prompt }}"</p>
+          </div>
+        </div>
+        <div class="card-info">
+          <span class="date">{{ image.createdAt | date:'mediumDate' }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="!loadingAi && aiImages.length === 0" class="no-data">
+      <p *ngIf="!searchAi">Aún no se han generado imágenes con IA.</p>
+      <p *ngIf="searchAi">No se encontraron imágenes para "{{ searchAi }}".</p>
+      <button *ngIf="searchAi" (click)="searchAi=''; onSearchAi()" class="retry-btn">Ver todas</button>
+    </div>
+
+    <!-- Paginación AI -->
+    <div class="pagination" *ngIf="!loadingAi && !errorAi">
+      <button [disabled]="pageAi === 1" (click)="changePageAi(-1)" class="pag-btn">Anterior</button>
+      <span class="pag-info">Página {{ pageAi }} de {{ totalPagesAi }} · {{ limitAi }} por página</span>
+      <button [disabled]="pageAi === totalPagesAi" (click)="changePageAi(1)" class="pag-btn">Siguiente</button>
+    </div>
+  </section>
+</div>

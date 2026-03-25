@@ -1,0 +1,32 @@
+{
+  "name": "backend-node",
+  "version": "1.0.0",
+  "description": "Desarollando un API REST con Node, Mongo, Express, JWT y OpenAI",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Matias Marcelo Dei Castelli",
+  "license": "ISC",
+  "dependencies": {
+    "@huggingface/inference": "^4.13.15",
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.6",
+    "dotenv": "^17.3.1",
+    "express": "^5.2.1",
+    "jwt-simple": "^0.5.6",
+    "mongoose": "^9.2.1",
+    "mongoose-paginate-v2": "^1.9.1",
+    "multer": "^2.0.2",
+    "openai": "^6.22.0",
+    "sharp": "^0.34.5",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1",
+    "validator": "^13.15.26"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.11"
+  }
+}

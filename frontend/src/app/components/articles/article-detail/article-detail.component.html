@@ -1,0 +1,29 @@
+<div class="container detail-container" *ngIf="article">
+  <div class="glass-card detail-card">
+    <div class="detail-image" *ngIf="article.image">
+      <img [src]="url + 'articles/' + article._id + '/poster'" [alt]="article.title" onerror="this.src='https://images.unsplash.com/photo-1557683316-973673baf926?q=80&w=1000'">
+    </div>
+    
+    <div class="detail-header">
+      <h1>{{ article.title }}</h1>
+      <div class="meta">
+        <span class="author" *ngIf="article.user">Publicado por: {{ article.user?.name }} {{ article.user?.surname }}</span>
+        <span class="date">{{ article.createdAt | date:'longDate' }}</span>
+      </div>
+    </div>
+
+    <div class="detail-content">
+      <p>{{ article.content }}</p>
+    </div>
+
+    <div class="detail-footer">
+      <a routerLink="/" class="back-link">← Volver al Inicio</a>
+      <a routerLink="/gallery" class="back-link">← Volver a la Galería</a>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="loading" class="loader">
+  <div class="spinner"></div>
+  <p>Cargando artículo...</p>
+</div>

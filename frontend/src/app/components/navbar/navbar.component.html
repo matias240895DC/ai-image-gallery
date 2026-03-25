@@ -1,0 +1,34 @@
+<nav class="navbar">
+  <div class="nav-container">
+    <a routerLink="/" class="logo">
+      <img
+        *ngIf="logoDataUrl && !logoLoadFailed"
+        [src]="logoDataUrl"
+        alt="Logo del proyecto"
+        class="logo-image"
+        (error)="logoLoadFailed = true"
+        (load)="logoLoadFailed = false"
+      />
+      <span *ngIf="!logoDataUrl || logoLoadFailed">{{ projectName }}-<span>{{ projectSuffix }}</span></span>
+    </a>
+    
+    <ul class="nav-links">
+      <li><a routerLink="/gallery" routerLinkActive="active">Galería</a></li>
+      <li *ngIf="token"><a routerLink="/ia-generator" routerLinkActive="active" appNavAllowed="/ia-generator">IA Generator</a></li>
+      <li *ngIf="token"><a routerLink="/manage-articles" routerLinkActive="active" appNavAllowed="/manage-articles">Mis Artículos</a></li>
+      <li><a routerLink="/terms" routerLinkActive="active">Términos</a></li>
+      <li *ngIf="token && user?.role === 'superadmin'"><a routerLink="/admin" routerLinkActive="active" class="admin-link" appNavAllowed="/admin">⚙ Admin</a></li>
+    </ul>
+
+    <div class="nav-auth">
+      <ng-container *ngIf="!token">
+        <a routerLink="/login" class="login-btn">Login</a>
+        <a routerLink="/register" class="register-btn">Register</a>
+      </ng-container>
+      <ng-container *ngIf="token && user">
+        <span class="user-name">Hola, {{ user.name }}</span>
+        <button (click)="logout()" class="logout-btn">Logout</button>
+      </ng-container>
+    </div>
+  </div>
+</nav>

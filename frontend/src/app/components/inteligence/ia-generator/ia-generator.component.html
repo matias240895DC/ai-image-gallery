@@ -1,0 +1,49 @@
+<div class="container">
+  <div class="glass-card generator-card">
+    <header>
+      <h2>AI Image Generator</h2>
+      <p>Convierte tus ideas en arte digital con Stable Diffusion</p>
+    </header>
+
+    <div class="input-section">
+      <textarea 
+        [(ngModel)]="prompt" 
+        placeholder="Describe la imagen que quieres generar... (ej. Un astronauta montando un caballo en Marte, estilo cyberpunk)"
+        rows="4">
+      </textarea>
+      
+      <div class="actions">
+        <button (click)="generate()" class="primary" [disabled]="loading || !prompt">
+          {{ loading ? 'Generando...' : 'Generar Imagen' }}
+        </button>
+      </div>
+    </div>
+
+    <div class="result-section" *ngIf="imageUrl || error">
+      <div *ngIf="error" class="alert error">
+        <span class="icon">⚠️</span>
+        <div class="error-msg">
+          <strong>Contenido bloqueado:</strong> {{ error }}
+          <p>Por favor, intenta con un prompt diferente que cumpla con nuestras políticas de seguridad.</p>
+        </div>
+      </div>
+
+      <div *ngIf="imageUrl" class="image-display">
+        <img [src]="imageUrl" alt="Generated Image">
+        <div class="image-actions">
+          <a [href]="imageUrl" download="generated-image.jpg" class="download-btn">Descargar</a>
+        </div>
+      </div>
+    </div>
+    
+    <div class="loading-state" *ngIf="loading">
+      <div class="spinner"></div>
+      <p>{{ waitingMessage }}</p>
+      <p class="timer-hint" *ngIf="showTimerHint">Esto puede tardar hasta 1 minuto en la versión gratuita...</p>
+    </div>
+
+    <footer class="legal-footer">
+      <p>⚠️ <strong>Aviso Legal:</strong> El usuario es el único responsable del contenido generado. Todas las peticiones quedan registradas con <strong>IP, Fecha y Texto</strong> para garantizar el cumplimiento de nuestras políticas de seguridad y la ley vigente.</p>
+    </footer>
+  </div>
+</div>

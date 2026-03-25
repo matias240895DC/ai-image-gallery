@@ -1,0 +1,107 @@
+<div class="admin-container">
+  <header class="admin-header">
+    <h1>Panel de Administración</h1>
+    <div class="tabs">
+      <button [class.active]="activeTab === 'logs'" (click)="setTab('logs')">Logs de Seguridad</button>
+      <button [class.active]="activeTab === 'users'" (click)="setTab('users')">Gestión de Usuarios</button>
+    </div>
+  </header>
+
+  <main class="admin-content">
+    <div *ngIf="errorMsg" class="error-banner">{{ errorMsg }}</div>
+
+    <!-- Pestaña de Logs -->
+    <section *ngIf="activeTab === 'logs'">
+      <div class="table-actions">
+        <h2>Últimos Prompts Enviados a la IA</h2>
+        <button class="refresh-btn" (click)="loadLogs()" [disabled]="isLoadingLogs">
+          {{ isLoadingLogs ? 'Cargando...' : 'Actualizar' }}
+        </button>
+      </div>
+
+      <div class="table-responsive">
+        <table>
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Usuario</th>
+              <th>IP Pública</th>
+              <th>Prompt</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let log of logs">
+              <td class="date-cell">{{ formatDate(log.createdAt) }}</td>
+              <td>
+                <div class="user-info">
+                  <strong>{{ log.user?.nick || 'Anon' }}</strong>
+                  <span>{{ log.user?.email }}</span>
+                </div>
+              </td>
+              <td><code>{{ log.ip }}</code></td>
+              <td class="prompt-cell" [title]="log.prompt">{{ truncate(log.prompt) }}</td>
+              <td>
+                <span [class]="'status-badge ' + getStatusClass(log.status)">
+                  {{ log.status === 'allowed' ? 'Permitido' : 'Denegado' }}
+                </span>
+                <small *ngIf="log.reason" class="reason text-muted">{{ log.reason }}</small>
+              </td>
+            </tr>
+            <tr *ngIf="logs.length === 0 && !isLoadingLogs">
+              <td colspan="5" class="empty-state">No hay logs registrados</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Pestaña de Usuarios -->
+    <section *ngIf="activeTab === 'users'">
+      <div class="table-actions">
+        <h2>Usuarios del Sistema</h2>
+        <button class="refresh-btn" (click)="loadUsers()" [disabled]="isLoadingUsers">
+          {{ isLoadingUsers ? 'Cargando...' : 'Actualizar' }}
+        </button>
+      </div>
+
+      <div class="table-responsive">
+        <table>
+          <thead>
+            <tr>
+              <th>Usuario</th>
+              <th>Email</th>
+              <th>Rol Actual</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let u of users">
+              <td>
+                <div class="user-info">
+                  <strong>{{ u.name }} {{ u.surname }}</strong>
+                  <span>@{{ u.nick }}</span>
+                </div>
+              </td>
+              <td>{{ u.email }}</td>
+              <td>
+                <span [class]="u.role === 'superadmin' ? 'role-admin' : 'role-user'">
+                  {{ u.role }}
+                </span>
+              </td>
+              <td>
+                <button 
+                  class="action-btn" 
+                  [class.btn-promote]="u.role === 'user'"
+                  [class.btn-demote]="u.role === 'superadmin'"
+                  (click)="toggleRole(u)">
+                  {{ u.role === 'user' ? 'Promover a Admin' : 'Quitar Admin' }}
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+</div>

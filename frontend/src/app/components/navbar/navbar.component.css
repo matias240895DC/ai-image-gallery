@@ -1,0 +1,123 @@
+.navbar {
+  background: rgba(11, 17, 32, 0.78);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--glass-border);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  padding: 0.9rem 0;
+}
+.nav-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 0 2rem;
+  flex-wrap: wrap;
+}
+.logo {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: white;
+  text-decoration: none;
+  letter-spacing: -0.03em;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}
+.logo span {
+  color: var(--primary);
+}
+.logo-image {
+  width: 44px;
+  height: 44px;
+  object-fit: cover;
+  border-radius: 0.6rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 6px 16px rgba(2, 6, 23, 0.25);
+}
+.nav-links {
+  display: flex;
+  gap: 1.2rem;
+  list-style: none;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.nav-links a {
+  color: var(--text-muted);
+  font-weight: 600;
+  font-size: 0.92rem;
+  text-decoration: none;
+  padding: 0.45rem 0.72rem;
+  border-radius: 999px;
+}
+.nav-links a:hover, .nav-links a.active {
+  color: white;
+  background: rgba(99, 102, 241, 0.16);
+}
+.nav-auth {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+.login-btn {
+  color: white;
+  font-weight: 600;
+  text-decoration: none;
+  padding: 0.55rem 0.85rem;
+  border-radius: 0.6rem;
+}
+.login-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+.register-btn {
+  padding: 0.5rem 1.25rem;
+  border-radius: 0.5rem;
+  color: white;
+  font-weight: 600;
+  text-decoration: none;
+}
+.logout-btn {
+  background: transparent;
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  padding: 0.4rem 1rem;
+  font-size: 0.9rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+}
+.logout-btn:hover {
+  background: var(--accent);
+  color: white;
+}
+.user-name {
+  font-weight: 500;
+  color: var(--text-muted);
+}
+.admin-link {
+  color: #f59e0b !important;
+  font-weight: 700 !important;
+}
+.admin-link:hover {
+  color: #fcd34d !important;
+}
+
+@media (max-width: 900px) {
+  .nav-container {
+    padding: 0 1rem;
+  }
+
+  .nav-links {
+    order: 3;
+    width: 100%;
+  }
+
+  .nav-auth {
+    margin-left: auto;
+  }
+}

@@ -1,0 +1,69 @@
+.auth-wrapper {
+  min-height: calc(100vh - 80px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.2rem;
+}
+.auth-card {
+  width: 100%;
+  max-width: 560px;
+  text-align: center;
+  padding: 2rem;
+}
+h2 { margin-bottom: 0.5rem; font-size: clamp(1.6rem, 3vw, 2rem); }
+.subtitle { color: var(--text-muted); margin-bottom: 2rem; }
+.form-group { text-align: left; margin-bottom: 1.25rem; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+label { display: block; margin-bottom: 0.45rem; font-size: 0.9rem; font-weight: 600; }
+.w-full { width: 100%; margin-top: 1rem; }
+.alert { padding: 0.75rem; border-radius: 0.5rem; margin-bottom: 1.5rem; font-size: 0.9rem; }
+.success { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.2); }
+.error { background: rgba(244, 63, 94, 0.2); color: #fb7185; border: 1px solid rgba(244, 63, 94, 0.2); }
+.error-text { color: #fb7185; font-size: 0.75rem; margin-top: 0.25rem; display: block; }
+.required { color: #fb7185; margin-left: 2px; }
+input.ng-invalid.ng-touched { border-color: #fb7185; }
+.input-wrapper { position: relative; display: flex; align-items: center; }
+.input-wrapper input { padding-right: 3rem; width: 100%; }
+.toggle-btn { 
+  position: absolute; 
+  right: 1rem; 
+  background: none !important; 
+  border: none !important; 
+  box-shadow: none !important; 
+  padding: 0 !important; 
+  cursor: pointer; 
+  margin: 0 !important;
+  font-size: 1.2rem;
+  color: var(--text-muted);
+  opacity: 0.6;
+}
+.toggle-btn:hover { opacity: 1; transform: scale(1.1); }
+button:disabled { 
+  background: rgba(99, 102, 241, 0.3) !important; 
+  cursor: not-allowed; 
+  box-shadow: none !important;
+  opacity: 0.7;
+}
+.footer { margin-top: 2rem; font-size: 0.9rem; color: var(--text-muted); }
+.footer a { color: var(--primary); font-weight: 600; }
+
+.terms-disclaimer {
+  margin-top: 0.9rem;
+  font-size: 0.8rem;
+  color: #7c8aa3;
+}
+
+.terms-disclaimer a {
+  color: #a5b4fc;
+}
+
+@media (max-width: 768px) {
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .auth-card {
+    padding: 1.2rem;
+  }
+}

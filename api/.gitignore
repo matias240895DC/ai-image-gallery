@@ -1,0 +1,40 @@
+# Dependencias de Node
+node_modules/
+
+# Entorno y variables secretas (¡MUY IMPORTANTE!)
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# Logs de los gestores de paquetes
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Directorios de imágenes subidas o generadas (ignoramos el contenido, no la carpeta)
+uploads/*
+config/helpers/upload/article/*
+config/helpers/upload/ai/*
+config/helpers/upload/user/*
+
+# Excepción: Mantenemos el archivo .gitkeep para que git suba la carpeta vacía y no falle el backend
+!uploads/.gitkeep
+!config/helpers/upload/article/.gitkeep
+!config/helpers/upload/ai/.gitkeep
+!config/helpers/upload/user/.gitkeep
+
+# Archivos del sistema operativo
+.DS_Store
+Thumbs.db
+
+# Editor de código y entornos (IDE)
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

@@ -1,0 +1,483 @@
+<div class="admin-container">
+  <header class="admin-header">
+    <h1>Panel de Administración</h1>
+    <div class="tabs">
+      <button [class.active]="activeTab === 'logs'" (click)="setTab('logs')">Logs de Seguridad</button>
+      <button [class.active]="activeTab === 'users'" (click)="setTab('users')">Gestión de Usuarios</button>
+      <button [class.active]="activeTab === 'content'" (click)="setTab('content')">Contenido & IP</button>
+      <button [class.active]="activeTab === 'branding'" (click)="setTab('branding')">Apariencia</button>
+    </div>
+  </header>
+
+  <div *ngIf="errorMsg" class="error-banner">
+    {{ errorMsg }}
+  </div>
+
+  <!-- SECCIÓN LOGS -->
+  <section *ngIf="activeTab === 'logs'" class="admin-section">
+    <div class="section-header">
+      <h2>Logs de Seguridad</h2>
+      <div class="filters-row">
+        <div class="search-box">
+          <input type="text" [(ngModel)]="logsSearch" placeholder="Buscar por prompt, IP o usuario..." (keyup.enter)="onSearchLogs()">
+          <button (click)="onSearchLogs()" class="btn-search">🔍</button>
+        </div>
+        <select class="status-filter" [(ngModel)]="logsStatusFilter" (change)="onLogsStatusFilterChange()">
+          <option value="all">Todos los estados</option>
+          <option value="allowed">Permitido</option>
+          <option value="denied">No permitido / Denegado</option>
+        </select>
+      </div>
+      <button class="btn-refresh" (click)="loadLogs()" [disabled]="isLoadingLogs">
+        {{ isLoadingLogs ? 'Cargando...' : 'Actualizar' }}
+      </button>
+    </div>
+
+    <div class="table-responsive">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Usuario</th>
+            <th>IP</th>
+            <th>Prompt</th>
+            <th>Estado</th>
+            <th>Fecha</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let log of logs">
+            <td>
+              <div class="user-info" *ngIf="log.user">
+                <strong>{{ log.user.name }}</strong>
+                <span>@{{ log.user.nick }}</span>
+              </div>
+              <span *ngIf="!log.user" class="text-muted">Anónimo</span>
+            </td>
+            <td><code>{{ log.ip }}</code></td>
+            <td class="prompt-cell">{{ log.prompt }}</td>
+            <td>
+              <span [class]="getStatusClass(log.status)">
+                {{ log.status === 'allowed' ? 'Permitido' : 'Denegado' }}
+              </span>
+            </td>
+            <td>{{ log.createdAt | date:'dd/MM/yy HH:mm' }}</td>
+          </tr>
+          <tr *ngIf="!isLoadingLogs && logs.length === 0">
+            <td colspan="5" class="empty-cell">No se encontraron logs con los filtros aplicados.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pagination">
+      <button [disabled]="logsPage === 1 || isLoadingLogs" (click)="changeLogsPage(-1)">Anterior</button>
+      <span>Página {{ logsPage }} de {{ logsTotalPages }}</span>
+      <button [disabled]="logsPage === logsTotalPages || isLoadingLogs" (click)="changeLogsPage(1)">Siguiente</button>
+    </div>
+  </section>
+
+  <!-- SECCIÓN USUARIOS -->
+  <section *ngIf="activeTab === 'users'" class="admin-section">
+    <div class="section-header">
+      <h2>Usuarios del Sistema</h2>
+      <div class="search-box">
+        <input type="text" [(ngModel)]="usersSearch" placeholder="Buscar por nombre, nick o email..." (keyup.enter)="onSearchUsers()">
+        <button (click)="onSearchUsers()" class="btn-search">🔍</button>
+      </div>
+      <button class="btn-refresh" (click)="loadUsers()" [disabled]="isLoadingUsers">
+        {{ isLoadingUsers ? 'Cargando...' : 'Actualizar' }}
+      </button>
+    </div>
+
+    <div class="table-responsive">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Usuario</th>
+            <th>Email</th>
+            <th>Rol Actual</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let u of users">
+            <td>
+              <div class="user-info">
+                <strong>{{ u.name }} {{ u.surname }}</strong>
+                <span>@{{ u.nick }}</span>
+              </div>
+            </td>
+            <td>{{ u.email }}</td>
+            <td>
+              <span [class]="u.role === 'superadmin' ? 'role-admin' : 'role-user'">
+                {{ u.role }}
+              </span>
+            </td>
+            <td>
+              <span [class]="u.status === 'active' ? 'status-active' : 'status-inactive'">
+                {{ u.status === 'active' ? 'Activo' : 'Inactivo' }}
+              </span>
+            </td>
+            <td>
+              <div class="action-group">
+                <button 
+                  class="action-btn" 
+                  [class.btn-promote]="u.role === 'user'"
+                  [class.btn-demote]="u.role === 'superadmin'"
+                  (click)="toggleRole(u)"
+                  title="Cambiar Rol">
+                  {{ u.role === 'user' ? 'Admin' : 'User' }}
+                </button>
+                <button 
+                  class="action-btn" 
+                  [class.btn-activate]="u.status === 'inactive'"
+                  [class.btn-deactivate]="u.status === 'active'"
+                  (click)="toggleStatus(u)"
+                  title="Cambiar Estado">
+                  {{ u.status === 'active' ? 'Desactivar' : 'Activar' }}
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pagination">
+      <button [disabled]="usersPage === 1 || isLoadingUsers" (click)="changeUsersPage(-1)">Anterior</button>
+      <span>Página {{ usersPage }} de {{ usersTotalPages }}</span>
+      <button [disabled]="usersPage === usersTotalPages || isLoadingUsers" (click)="changeUsersPage(1)">Siguiente</button>
+    </div>
+  </section>
+
+  <!-- SECCIÓN CONTENIDO E IP -->
+  <section *ngIf="activeTab === 'content'" class="admin-section">
+    <div class="section-header">
+      <h2>Artículos creados (IP)</h2>
+      <div class="search-box">
+        <input type="text" [(ngModel)]="contentArticlesSearch" placeholder="Buscar por título, contenido o IP..." (keyup.enter)="onSearchAdminArticles()">
+        <button (click)="onSearchAdminArticles()" class="btn-search">🔍</button>
+      </div>
+      <button class="btn-refresh" (click)="loadAdminArticles()" [disabled]="isLoadingAdminArticles">
+        {{ isLoadingAdminArticles ? 'Cargando...' : 'Actualizar' }}
+      </button>
+    </div>
+
+    <div class="table-responsive">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Título</th>
+            <th>Usuario</th>
+            <th>IP Creador</th>
+            <th>Fecha</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of adminArticles">
+            <td>{{ item.title }}</td>
+            <td>{{ item.user?.nick || 'N/A' }}</td>
+            <td><code>{{ item.creatorIp || 'N/A' }}</code></td>
+            <td>{{ item.createdAt | date:'dd/MM/yy HH:mm' }}</td>
+          </tr>
+          <tr *ngIf="!isLoadingAdminArticles && adminArticles.length === 0">
+            <td colspan="4" class="empty-cell">No hay artículos para mostrar.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pagination">
+      <button [disabled]="contentArticlesPage === 1 || isLoadingAdminArticles" (click)="changeAdminArticlesPage(-1)">Anterior</button>
+      <span>Página {{ contentArticlesPage }} de {{ contentArticlesTotalPages }}</span>
+      <button [disabled]="contentArticlesPage === contentArticlesTotalPages || isLoadingAdminArticles" (click)="changeAdminArticlesPage(1)">Siguiente</button>
+    </div>
+
+    <div class="section-header mt-24">
+      <h2>Imágenes IA creadas (IP)</h2>
+      <div class="search-box">
+        <input type="text" [(ngModel)]="contentAiSearch" placeholder="Buscar por prompt o IP..." (keyup.enter)="onSearchAdminAiImages()">
+        <button (click)="onSearchAdminAiImages()" class="btn-search">🔍</button>
+      </div>
+      <button class="btn-refresh" (click)="loadAdminAiImages()" [disabled]="isLoadingAdminAiImages">
+        {{ isLoadingAdminAiImages ? 'Cargando...' : 'Actualizar' }}
+      </button>
+    </div>
+
+    <div class="table-responsive">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Prompt</th>
+            <th>Usuario</th>
+            <th>IP Creador</th>
+            <th>Fecha</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of adminAiImages">
+            <td class="prompt-cell" [title]="item.prompt">{{ truncate(item.prompt, 90) }}</td>
+            <td>{{ item.user?.nick || 'N/A' }}</td>
+            <td><code>{{ item.creatorIp || 'N/A' }}</code></td>
+            <td>{{ item.createdAt | date:'dd/MM/yy HH:mm' }}</td>
+          </tr>
+          <tr *ngIf="!isLoadingAdminAiImages && adminAiImages.length === 0">
+            <td colspan="4" class="empty-cell">No hay imágenes IA para mostrar.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pagination">
+      <button [disabled]="contentAiPage === 1 || isLoadingAdminAiImages" (click)="changeAdminAiPage(-1)">Anterior</button>
+      <span>Página {{ contentAiPage }} de {{ contentAiTotalPages }}</span>
+      <button [disabled]="contentAiPage === contentAiTotalPages || isLoadingAdminAiImages" (click)="changeAdminAiPage(1)">Siguiente</button>
+    </div>
+  </section>
+
+  <!-- SECCIÓN APARIENCIA -->
+  <section *ngIf="activeTab === 'branding'" class="admin-section">
+    <div class="branding-card glass-card">
+      <div class="branding-head">
+        <h2>Personalización del Proyecto</h2>
+        <p>Administra logo, colores y texto de la plataforma.</p>
+      </div>
+
+      <form class="branding-form" (ngSubmit)="saveBranding()">
+        <div class="branding-grid">
+          <div class="form-group full">
+            <label>Logo del proyecto</label>
+            <div class="logo-upload-row">
+              <input type="file" accept="image/*" (change)="onLogoChange($event)" />
+              <button type="button" class="btn-refresh" (click)="clearLogo()" [disabled]="!branding.logoDataUrl">
+                Quitar logo
+              </button>
+            </div>
+            <div class="logo-preview" *ngIf="branding.logoDataUrl">
+              <img [src]="branding.logoDataUrl" alt="Vista previa del logo" />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Texto principal del logo</label>
+            <input type="text" [(ngModel)]="branding.projectName" name="projectName" maxlength="24" />
+          </div>
+
+          <div class="form-group">
+            <label>Texto resaltado del logo</label>
+            <input type="text" [(ngModel)]="branding.projectSuffix" name="projectSuffix" maxlength="12" />
+          </div>
+
+          <div class="form-group full">
+            <label>Texto descriptivo del proyecto</label>
+            <input type="text" [(ngModel)]="branding.homeTagline" name="homeTagline" maxlength="120" />
+          </div>
+
+          <div class="form-group">
+            <label>Tamaño de párrafos (px)</label>
+            <input
+              type="number"
+              min="12"
+              max="24"
+              step="1"
+              [(ngModel)]="branding.paragraphFontSizePx"
+              name="paragraphFontSizePx"
+            />
+          </div>
+
+          <div class="form-group">
+            <label>Tamaño de títulos (px)</label>
+            <input
+              type="number"
+              min="12"
+              max="64"
+              step="1"
+              [(ngModel)]="branding.titleFontSizePx"
+              name="titleFontSizePx"
+            />
+          </div>
+
+          <div class="form-group">
+            <label>Color principal</label>
+            <div class="color-control">
+              <input type="color" [(ngModel)]="branding.primaryColor" name="primaryColor" />
+              <span>{{ branding.primaryColor }}</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Color acento</label>
+            <div class="color-control">
+              <input type="color" [(ngModel)]="branding.accentColor" name="accentColor" />
+              <span>{{ branding.accentColor }}</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Color de fondo principal</label>
+            <div class="color-control">
+              <input type="color" [(ngModel)]="branding.backgroundColor" name="backgroundColor" />
+              <span>{{ branding.backgroundColor }}</span>
+            </div>
+          </div>
+
+          <div class="form-group full">
+            <label>Galería - subtítulo (p)</label>
+            <textarea
+              [(ngModel)]="branding.galleryHeaderSubtitle"
+              name="galleryHeaderSubtitle"
+              rows="2"
+              maxlength="160"
+            ></textarea>
+          </div>
+
+          <div class="form-group">
+            <label>Galería - título “Artículos Recientes”</label>
+            <input type="text" [(ngModel)]="branding.galleryRecentTitle" name="galleryRecentTitle" maxlength="60" />
+          </div>
+
+          <div class="form-group">
+            <label>Galería - descripción “Artículos Recientes”</label>
+            <input
+              type="text"
+              [(ngModel)]="branding.galleryRecentSubtitle"
+              name="galleryRecentSubtitle"
+              maxlength="120"
+            />
+          </div>
+
+          <div class="form-group">
+            <label>Galería - título “Arte IA”</label>
+            <input type="text" [(ngModel)]="branding.galleryAiTitle" name="galleryAiTitle" maxlength="60" />
+          </div>
+
+          <div class="form-group full">
+            <label>Galería - descripción “Arte IA”</label>
+            <textarea
+              [(ngModel)]="branding.galleryAiSubtitle"
+              name="galleryAiSubtitle"
+              rows="2"
+              maxlength="180"
+            ></textarea>
+          </div>
+
+          <div class="form-group full">
+            <label>Términos - título (h1)</label>
+            <input type="text" [(ngModel)]="branding.termsTitle" name="termsTitle" maxlength="80" />
+          </div>
+
+          <div class="form-group full">
+            <label>Términos - última actualización</label>
+            <input type="text" [(ngModel)]="branding.termsLastUpdated" name="termsLastUpdated" maxlength="120" />
+          </div>
+
+          <div class="form-group full">
+            <label>Términos - botón volver</label>
+            <input type="text" [(ngModel)]="branding.termsBackText" name="termsBackText" maxlength="60" />
+          </div>
+
+          <div class="form-group full">
+            <label>Sección 1 - título</label>
+            <input
+              type="text"
+              [(ngModel)]="branding.termsSection1Title"
+              name="termsSection1Title"
+              maxlength="90"
+            />
+          </div>
+
+          <div class="form-group full">
+            <label>Sección 1 - texto</label>
+            <textarea
+              [(ngModel)]="branding.termsSection1Body"
+              name="termsSection1Body"
+              rows="3"
+              maxlength="600"
+            ></textarea>
+          </div>
+
+          <div class="form-group full">
+            <label>Sección 2 - título</label>
+            <input
+              type="text"
+              [(ngModel)]="branding.termsSection2Title"
+              name="termsSection2Title"
+              maxlength="90"
+            />
+          </div>
+
+          <div class="form-group full">
+            <label>Sección 2 - introducción</label>
+            <textarea
+              [(ngModel)]="branding.termsSection2Intro"
+              name="termsSection2Intro"
+              rows="2"
+              maxlength="400"
+            ></textarea>
+          </div>
+
+          <div class="form-group">
+            <label>Sección 2 - bullet 1</label>
+            <input type="text" [(ngModel)]="branding.termsSection2Bullet1" name="termsSection2Bullet1" maxlength="150" />
+          </div>
+          <div class="form-group">
+            <label>Sección 2 - bullet 2</label>
+            <input type="text" [(ngModel)]="branding.termsSection2Bullet2" name="termsSection2Bullet2" maxlength="150" />
+          </div>
+          <div class="form-group">
+            <label>Sección 2 - bullet 3</label>
+            <input type="text" [(ngModel)]="branding.termsSection2Bullet3" name="termsSection2Bullet3" maxlength="150" />
+          </div>
+
+          <div class="form-group full">
+            <label>Sección 3 - título</label>
+            <input
+              type="text"
+              [(ngModel)]="branding.termsSection3Title"
+              name="termsSection3Title"
+              maxlength="90"
+            />
+          </div>
+
+          <div class="form-group full">
+            <label>Sección 3 - texto (HTML permitido)</label>
+            <textarea
+              [(ngModel)]="branding.termsSection3BodyHtml"
+              name="termsSection3BodyHtml"
+              rows="3"
+              maxlength="800"
+            ></textarea>
+          </div>
+
+          <div class="form-group full">
+            <label>Sección 4 - título</label>
+            <input
+              type="text"
+              [(ngModel)]="branding.termsSection4Title"
+              name="termsSection4Title"
+              maxlength="90"
+            />
+          </div>
+
+          <div class="form-group full">
+            <label>Sección 4 - texto</label>
+            <textarea
+              [(ngModel)]="branding.termsSection4Body"
+              name="termsSection4Body"
+              rows="3"
+              maxlength="600"
+            ></textarea>
+          </div>
+        </div>
+
+        <div class="branding-actions">
+          <button type="button" class="btn-refresh" (click)="resetBranding()">Restablecer</button>
+          <button type="submit" class="btn-refresh save-btn">Guardar cambios</button>
+        </div>
+
+        <p class="save-hint" *ngIf="brandingSaved">Configuración guardada correctamente.</p>
+      </form>
+    </div>
+  </section>
+</div>
